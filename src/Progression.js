@@ -5,8 +5,6 @@ var EventDispatcher = JClass.extend(require('events').EventEmitter.prototype),
 
 var Progression = EventDispatcher.extend({
   init: function () {
-    this._super();
-
     this.__tasks = new HashArray(['id']);
   },
   getTasks: function () {
