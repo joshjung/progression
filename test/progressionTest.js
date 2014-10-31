@@ -83,13 +83,15 @@ describe('Progression', function() {
     p.addTask('main');
     
     var dispatched = false;
-    
-    p.on('completed', function () {
+
+    p.on('completed', function (task) {
+      assert.equal(task.id, 'main');
       dispatched = true;
     });
 
     it('should be dispatched whenever progress() is called on a task that has been completed', function() {
       p.progress('main');
+      
       assert.equal(dispatched, true);
     });
   });
