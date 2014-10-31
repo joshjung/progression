@@ -8,6 +8,14 @@ describe('Progression', function() {
     it('should have a progression task array', function() {
       assert.equal(p.getTasks().all.length, 0);
     });
+    
+    it('should have lastProgress of 0', function() {
+      assert.equal(p.lastProgress, 0);
+    });
+    
+    it('should have getProgress() of 0', function() {
+      assert.equal(p.getProgress(), 0);
+    });
 	});
 
 	describe('addTask(...)', function() {

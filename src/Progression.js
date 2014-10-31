@@ -5,8 +5,13 @@ var EventDispatcher = JClass.extend(require('events').EventEmitter.prototype),
 
 var Progression = EventDispatcher.extend({
   init: function () {
+    this.reset();
+  },
+  reset: function () {
     this._tasks = new HashArray(['id', 'group']);
     this.lastProgress = 0;
+
+    this.update();
   },
   getTasks: function () {
     return this._tasks;
@@ -18,6 +23,9 @@ var Progression = EventDispatcher.extend({
     return this._tasks.getAsArray('$' + id);
   },
   getProgress: function () {
+    if (this._tasks.all.length == 0)
+      return 0.0;
+      
     var total = this._tasks.sum('*', 'count', 'weight'),
       actual = this._tasks.filter('*', 'completed').sum('*', 'count', 'weight');
 
