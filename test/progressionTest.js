@@ -5,14 +5,14 @@ describe('Progression', function() {
 	describe('new Progression() should work', function() {
 		var p = new Progression();
 
-    it('should have a progression task array', function() {
-      assert.equal(p.getTasks().all.length, 0);
+    it('should have a progression task array with a root node', function() {
+      assert.equal(p.getTasks().all.length, 1);
     });
-    
+
     it('should have lastProgress of 0', function() {
       assert.equal(p.lastProgress, 0);
     });
-    
+
     it('should have getProgress() of 0', function() {
       assert.equal(p.getProgress(), 0);
     });
@@ -23,8 +23,8 @@ describe('Progression', function() {
 
     p.addTask('task1');
 
-    it('after addTask, should have a progression task array', function() {
-      assert.equal(p.getTasks().all.length, 1);
+    it('after addTask, should have a new task and a root task', function() {
+      assert.equal(p.getTasks().all.length, 2);
     });
 
     it('should fail if the same task is added twice', function() {
@@ -67,7 +67,8 @@ describe('Progression', function() {
     
     var dispatched = false;
     
-    p.on('progress', function () {
+    p.on('progress', function (p) {
+      assert.equal(p, 1.0);
       dispatched = true;
     });
 
@@ -117,7 +118,7 @@ describe('Progression', function() {
     });
   });
 
-	describe('getProgress() and progress() with weighted tasks and no counts', function() {
+	describe('getProgress() and progress() with weighted tasks', function() {
 		var p = new Progression();
 
     p.addTask('main1');
@@ -142,39 +143,8 @@ describe('Progression', function() {
     });
 
     it('should error if you try to complete a parent task before children finish', function() {
-      assert.equal(p.getProgress(), 0);
-    });
-
-    it('should have appropriate weighted percentage complete after completing each item', function() {
-      var all = p.getTasks().all,
-        curWeightCompleted = 0;
-
-      // Complete all subtasks
-      all.forEach(function (task) {
-        if (!task.isParent())
-        {
-          p.progress(task.id);
-          
-          assert.equal(task.countCompleted, 1, 'task.completedCount should be 1!');
-          assert.equal(task.completed, true,'task.completed should be true!');
-          
-          curWeightCompleted += task.weight;
-          assert.equal(Math.round(p.getProgress() * 100), Math.round((curWeightCompleted / weightTotal) * 100));
-        }
-      });
-
-      // Complete parent tasks
-      all.forEach(function (task) {
-        if (task.isParent())
-        {
-          p.progress(task.id);
-          
-          assert.equal(task.countCompleted, 1, 'task.completedCount should be 1!');
-          assert.equal(task.completed, true,'task.completed should be true!');
-          
-          curWeightCompleted += task.weight;
-          assert.equal(Math.round(p.getProgress() * 100), Math.round((curWeightCompleted / weightTotal) * 100));
-        }
+      assert.throws(function () {p.progress('main1')}, function (err) {
+        return true;
       });
     });
 	});
