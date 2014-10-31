@@ -1,0 +1,23 @@
+{
+  "name": "progression",
+  "author": "Joshua Jung <joshua.p.jung@gmail.com>",
+  "license": "MIT",
+  "description": "A flexible JClass based object that keeps track of progress based on arbitrary tasks. Returns 0.0-1.0 on how far completed they are.",
+  "version": "0.0.1",
+  "main": "index.js",
+  "url": "https://github.com/joshjung/progression",
+  "homepage": "https://github.com/joshjung/progression",
+  "email": "joshua.p.jung@gmail.com",
+  "dependencies": {
+    "jclass": "^0.2.5"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/joshjung/progression.git"
+  },
+  "keywords": [
+    "progress",
+    "task",
+    "completion"
+  ]
+}
