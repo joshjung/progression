@@ -9,7 +9,7 @@
   "homepage": "https://github.com/joshjung/progression",
   "email": "joshua.p.jung@gmail.com",
   "dependencies": {
-    "hasharray": "^0.1.8",
+    "hasharray": "^0.1.9",
     "jclass": "^0.2.5"
   },
   "repository": {
