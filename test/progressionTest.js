@@ -76,6 +76,44 @@ describe('Progression', function() {
       assert.equal(dispatched, true);
     });
   });
+  
+  describe('\'completed\' event', function() {
+		var p = new Progression();
+
+    p.addTask('main');
+    
+    var dispatched = false;
+    
+    p.on('completed', function () {
+      dispatched = true;
+    });
+
+    it('should be dispatched whenever progress() is called on a task that has been completed', function() {
+      p.progress('main');
+      assert.equal(dispatched, true);
+    });
+  });
+  
+  describe('\'finished\' event', function() {
+		var p = new Progression();
+
+    p.addTask('main');
+    p.addTask('main2');
+    
+    var dispatched = false;
+    
+    p.on('finished', function () {
+      dispatched = true;
+    });
+
+    it('should ONLY be dispatched whenever that last task is completed and getProgress() is 1.0', function() {
+      p.progress('main');
+      assert.equal(dispatched, false);
+      p.progress('main2');
+      assert.equal(dispatched, true);
+      assert.equal(p.getProgress(), 1.0);
+    });
+  });
 
 	describe('getProgress() and progress() with weighted tasks and no counts', function() {
 		var p = new Progression();
