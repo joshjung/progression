@@ -51,7 +51,24 @@ describe('Progression', function() {
       assert.equal(p.getProgress(), 6/7);
     });
 	});
-  
+
+  describe('\'progress\' event', function() {
+		var p = new Progression();
+
+    p.addTask('main');
+    
+    var dispatched = false;
+    
+    p.on('progress', function () {
+      dispatched = true;
+    });
+
+    it('should be dispatched whenever progress() is called', function() {
+      p.progress('main');
+      assert.equal(dispatched, true);
+    });
+  });
+
 	describe('getProgress() and progress() with weighted tasks and no counts', function() {
 		var p = new Progression();
 
