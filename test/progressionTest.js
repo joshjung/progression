@@ -147,5 +147,34 @@ describe('Progression', function() {
         return true;
       });
     });
+    
+    it('should show appropriate parent task progress when sub task is completed (test1).', function() {
+      var main1 = p.getTask('main1');
+      p.progress('sub11');
+      
+      assert.equal(Math.round(main1.getProgress() * 100), 33);
+      assert.equal(Math.round(p.getProgress() * 100), 11);
+    });
+    
+    it('should show appropriate parent task progress when sub task is completed (test2).', function() {
+      var main1 = p.getTask('main1');
+      p.progress('sub12');
+      p.progress('sub13');
+      
+      assert.equal(main1.getProgress(), 1.0);
+    });
+    
+    it('should show appropriate parent task progress when sub task is completed (test3).', function() {
+      var main1 = p.getTask('main1');
+      p.progress('sub21');
+      p.progress('sub22');
+      p.progress('sub23');
+      
+      p.progress('sub31');
+      p.progress('sub32');
+      p.progress('sub33');
+      
+      assert.equal(p.getProgress(), 1.0);
+    });
 	});
 });

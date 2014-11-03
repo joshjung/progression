@@ -12,6 +12,7 @@ var TaskNode = JClass.extend({
     this.name = obj.name;
     this.weight = obj.weight || 1.0;
     this._tasks = undefined;
+    this.completed = false;
   },
   hasChildren: function () {
     return this._tasks !== undefined;
@@ -20,11 +21,15 @@ var TaskNode = JClass.extend({
     return this._tasks !== undefined;
   },
   isCompleted: function () {
-    var completed = this._tasks ? false : this.completed;
+    if (!this._tasks)
+      return this.completed;
 
-    this._tasks.all.forEach(function (task) {
-      completed = completed && task.isCompleted();
-    });
+    var completed = true;
+
+    if (this._tasks)
+      this._tasks.all.forEach(function (task) {
+        completed = completed && task.isCompleted();
+      });
 
     return completed;
   },
@@ -39,7 +44,7 @@ var TaskNode = JClass.extend({
       return this.progression.getProgress();
 
     if (!this.hasChildren())
-      return this.completed ? 1.0 : 0.0;
+      return this.isCompleted() ? 1.0 : 0.0;
 
     var p = 0.0,
       totalWeight = 0.0;
@@ -71,6 +76,15 @@ var Progression = EventDispatcher.extend({
 
     this.update();
   },
+  getUnfinishedTasks: function () {
+    var ret = [];
+
+    this._tasks.all.forEach(function (task) {
+      (!task.isCompleted()) ? ret.push(task.id) : '';
+    })
+
+    return ret;
+  },
   getTasks: function () {
     return this._tasks;
   },
@@ -85,6 +99,7 @@ var Progression = EventDispatcher.extend({
       this.addTask(arguments[key]);
   },
   addTask: function (taskOrProgression, parentId) {
+    var task = undefined;
     
     if (taskOrProgression.isProgression)
     {
@@ -93,11 +108,7 @@ var Progression = EventDispatcher.extend({
         
       taskOrProgression.on('progress', this.childProgression_progressHandler.bind(this));
 
-      var parentTask = this._tasks.get(parentId || 'root');
-
-      parentTask.addTask(taskOrProgression);
-
-      this._tasks.add(taskOrProgression);
+      task = new TaskNode(taskOrProgression);
     }
     else
     {
@@ -107,17 +118,16 @@ var Progression = EventDispatcher.extend({
         throw Error('Cannot have the same task added twice ' + taskOrProgression.id);
         
       task = new TaskNode(task);
-
-      var parentTask = this._tasks.get(parentId || 'root');
-
-      if (!parentTask)
-        throw Error('Could not find parentTask with id ' + parentId + ' on progression ' + this.id);
-        
-      parentTask.addTask(task);
-
-      this._tasks.add(task);
     }
 
+    var parentTask = this._tasks.get(parentId || 'root');
+
+    if (!parentTask)
+      throw Error('Could not find parentTask with id ' + parentId + ' on progression ' + this.id);
+      
+    parentTask.addTask(task);
+    
+    this._tasks.add(task);
     this.update(task);
   },
   update: function (task) {
