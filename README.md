@@ -68,7 +68,7 @@ Because each Progression instance can add other Progression instances as childre
     console.log(parentProgression.getProgress() == 1.0); // true
 
 Extending
----------
+=========
 
 Progression uses [jclass](https://www.npmjs.org/package/jclass), which is an implementation of [John Resig's simple inheritance model](http://ejohn.org/blog/simple-javascript-inheritance/).
 
@@ -87,9 +87,6 @@ You can easily extend Progression:
     var myCustomProgression = new MyCustomProgression();
 
 See the `jclass` documentation for more information.
-
-Extending
-=========
 
 License
 =======
