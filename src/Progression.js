@@ -1,9 +1,9 @@
 var JClass = require('jclass');
 
-var EventDispatcher = JClass.extend(require('events').EventEmitter.prototype),
+var EventDispatcher = JClass._extend(require('events').EventEmitter.prototype),
   HashArray = require('hasharray');
 
-var TaskNode = JClass.extend({
+var TaskNode = JClass._extend({
   init: function (obj) {
     if (obj.isProgression)
       this.progression = obj;
@@ -61,7 +61,7 @@ var TaskNode = JClass.extend({
   }
 });
   
-var Progression = EventDispatcher.extend({
+var Progression = EventDispatcher._extend({
   init: function (id) {
     this.id = id;
     this.weight = 1.0;
