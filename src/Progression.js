@@ -76,6 +76,22 @@ var Progression = EventDispatcher.extend({
 
     this.update();
   },
+  debug: function () {
+    // Show all uncompleted tasks
+    var ret = [];
+  
+    this._tasks.forEach('*', function (task) {
+      if (!task.isCompleted())
+      {
+        if (task.progression)
+          ret = ret.concat(task.progression.debug());
+        else
+          ret.push(task);
+      }
+    });
+    
+    return ret;
+  },
   getUnfinishedTasks: function () {
     var ret = [];
 

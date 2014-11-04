@@ -1,17 +1,17 @@
+![](https://nodei.co/npm/progression.png?downloads=True&stars=True)
+
 Progression
 ===========
 
-Progression keeps track of the 0.0-1.0 progress of an arbitrary set of tasks with weights (default weight is 1.0 per task).
+Progression reports a `0.0` - `1.0` progress of a tree of tasks where each task can have an arbitrarily assigned weight (default weight is 1.0 per task).
 
-Tasks look like:
+Tasks can be a simple object or another Progression object.
 
-    {
-      id: 'some unique id',
-      weight: 'some arbitrary numeric weight to weight this against all other tasks'
-    }
+Examples
+========
 
-Example
-=======
+Simple Use Case
+---------------
 
     var Progression = require('progression');
 
@@ -40,6 +40,56 @@ Example
     progress.progress('sub'); // This will trigger a 'progress' event and a 'completed' event for the subtask.
     
     progress.progress('main'); // Complete the final task and dispatch all three events: 'progress', 'completed', and 'finished'
+
+Resetting
+---------
+
+If you want to clear out all tasks and start over:
+
+    progress.reset();
+
+Task Trees
+----------
+
+Because each Progression instance can add other Progression instances as children, you can create trees of tasks/progression instances. The base Progression will accurately report the overall progress of all its descendents.
+
+    var Progression = require('progression');
+
+    var parentProgression = new Progression('parent');
+    var childProgression = new Progression('someChildName');
+    childProgression.addTask('task1');
+    
+    parentProgression.addTask(childProgress);
+    
+    ...
+    
+    childProgress.progress('task1');
+    
+    console.log(parentProgression.getProgress() == 1.0); // true
+
+Extending
+---------
+
+Progression uses [jclass](https://www.npmjs.org/package/jclass), which is an implementation of [John Resig's simple inheritance model](http://ejohn.org/blog/simple-javascript-inheritance/).
+
+You can easily extend Progression:
+
+    var MyCustomProgression = Progression._extend({
+      ...
+      init: function (id) 
+      {
+        console.log('My custom progression!');
+        this._super(id);
+      }
+      ...
+    });
+    
+    var myCustomProgression = new MyCustomProgression();
+
+See the `jclass` documentation for more information.
+
+Extending
+=========
 
 License
 =======
