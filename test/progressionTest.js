@@ -59,22 +59,45 @@ describe('Progression', function() {
       assert.equal(p.getProgress(), 6/7);
     });
 	});
-
-  describe('\'progress\' event', function() {
+  
+	describe('getProgress() and progress()', function() {
 		var p = new Progression();
 
-    p.addTask('main');
-    
-    var dispatched = false;
-    
-    p.on('progress', function (p) {
-      assert.equal(p, 1.0);
-      dispatched = true;
+    p.addTask('task1');
+    p.addTask('task2');
+    p.addTask('task3');
+    p.addTask('task4');
+    p.addTask('task5');
+    p.addTask('task6');
+
+    it('should have 0 percentage complete after adding no complete items', function() {
+      assert.equal(p.getProgress(), 0);
     });
 
-    it('should be dispatched whenever progress() is called', function() {
+    it('should have 1/n percentage complete after completing each item', function() {
+      for (var i = 1; i <= 6; i++)
+      {
+        p.progress('task' + i);
+        assert.equal(p.getProgress(), i / 6);
+      }
+    });
+
+    it('should have n/(n+1) percentage complete after completing each item AND adding another', function() {
+      p.addTask('taskFinal')
+      assert.equal(p.getProgress(), 6/7);
+    });
+
+    it('should error if task does not exist', function() {
+      assert.throws(function () {p.progress('thistaskdoesnotexist');}, function (err) {return true;});
+    });
+	});
+
+  describe('empty tasks', function() {
+		var p = new Progression();
+
+    it('should not error when progress() is called', function() {
       p.progress('main');
-      assert.equal(dispatched, true);
+      assert.equal(true, true);
     });
   });
   

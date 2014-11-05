@@ -1,19 +1,19 @@
-var JClass = require('jclass');
+/*===========================================================================*\
+ * Requires
+\*===========================================================================*/
+var JClass = require('jclass'),
+  debug = require('debug')('progression');
 
 var EventDispatcher = JClass._extend(require('events').EventEmitter.prototype),
   HashArray = require('hasharray');
 
+/*===========================================================================*\
+ * TaskNode
+\*===========================================================================*/
 var TaskNode = JClass._extend({
-  init: function (obj) {
-    if (obj.isProgression)
-      this.progression = obj;
-
-    this.id = obj.id;
-    this.name = obj.name;
-    this.weight = obj.weight || 1.0;
-    this._tasks = undefined;
-    this.completed = false;
-  },
+  //-----------------------------------
+  // Properties
+  //-----------------------------------
   hasChildren: function () {
     return this._tasks !== undefined;
   },
@@ -33,6 +33,22 @@ var TaskNode = JClass._extend({
 
     return completed;
   },
+  //-----------------------------------
+  // Constructor
+  //-----------------------------------
+  init: function (obj) {
+    if (obj.isProgression)
+      this.progression = obj;
+
+    this.id = obj.id;
+    this.name = obj.name;
+    this.weight = obj.weight || 1.0;
+    this._tasks = undefined;
+    this.completed = false;
+  },
+  //-----------------------------------
+  // Methods
+  //-----------------------------------
   addTask: function (task) {
     if (!this._tasks)
      this._tasks = new HashArray(['id']);
@@ -60,14 +76,47 @@ var TaskNode = JClass._extend({
     return (p / totalWeight);
   }
 });
-  
+
+/*===========================================================================*\
+ * Progression
+\*===========================================================================*/
 var Progression = EventDispatcher._extend({
+  //-----------------------------------
+  // Properties
+  //-----------------------------------
+  getUnfinishedTasks: function () {
+    var ret = [];
+
+    this._tasks.all.forEach(function (task) {
+      (!task.isCompleted()) ? ret.push(task.id) : '';
+    })
+
+    return ret;
+  },
+  getTasks: function () {
+    return this._tasks;
+  },
+  hasTasks: function () {
+    return this._tasks.all.length;
+  },
+  getTask: function (id) {
+    return this._tasks.get(id);
+  },
+  getProgress: function () {
+    return this.root.getProgress();
+  },
+  //-----------------------------------
+  // Constructor
+  //-----------------------------------
   init: function (id) {
     this.id = id;
     this.weight = 1.0;
     this.reset();
     this.isProgression = true;
   },
+  //-----------------------------------
+  // Methods
+  //-----------------------------------
   reset: function () {
     this._tasks = new HashArray(['id']);
     this.root = new TaskNode({id: 'root', weight: 1.0});
@@ -91,24 +140,6 @@ var Progression = EventDispatcher._extend({
     });
     
     return ret;
-  },
-  getUnfinishedTasks: function () {
-    var ret = [];
-
-    this._tasks.all.forEach(function (task) {
-      (!task.isCompleted()) ? ret.push(task.id) : '';
-    })
-
-    return ret;
-  },
-  getTasks: function () {
-    return this._tasks;
-  },
-  getTask: function (id) {
-    return this._tasks.get(id);
-  },
-  getProgress: function () {
-    return this.root.getProgress();
   },
   addTasks: function () {
     for (var key in arguments)
@@ -158,8 +189,17 @@ var Progression = EventDispatcher._extend({
     }
   },
   progress: function (id) {
+    if (this._tasks.all.length == 1)
+    {
+      debug('WARNING: progress() was called with no tasks added.');
+      return;
+    }
+
     var task = this._tasks.get(id);
 
+    if (!task)
+      throw Error('Task not found: ' + id);
+    
     if (task.hasChildren())
     {
       throw Error('Cannot add progress to a task with children. Complete all children to finish parent level task.');
@@ -172,6 +212,9 @@ var Progression = EventDispatcher._extend({
       
     this.update(task);
   },
+  //-----------------------------------
+  // Events
+  //-----------------------------------
   childProgression_progressHandler: function (p, task) {
     this.update(task);
   }
