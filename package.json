@@ -3,14 +3,14 @@
   "author": "Joshua Jung <joshua.p.jung@gmail.com>",
   "license": "MIT",
   "description": "A flexible JClass based object that keeps track of progress based on arbitrary tasks. Returns 0.0-1.0 on how far completed they are.",
-  "version": "0.0.7",
+  "version": "0.0.8",
   "main": "index.js",
   "url": "https://github.com/joshjung/progression",
   "homepage": "https://github.com/joshjung/progression",
   "email": "joshua.p.jung@gmail.com",
   "dependencies": {
     "debug": "^2.1.0",
-    "hasharray": "^0.1.9",
+    "hasharray": "^0.3.0",
     "jclass": "^1.0.1"
   },
   "repository": {

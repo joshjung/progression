@@ -151,7 +151,7 @@ var Progression = EventDispatcher._extend({
     if (taskOrProgression.isProgression)
     {
       if (this._tasks.has(taskOrProgression.id))
-        throw Error('Cannot have the same task added twice ' + taskOrProgression.id);
+        throw Error('Cannot have the same progression added twice ' + taskOrProgression);
         
       taskOrProgression.on('progress', this.childProgression_progressHandler.bind(this));
 
@@ -162,7 +162,7 @@ var Progression = EventDispatcher._extend({
       var task = typeof(taskOrProgression) == 'string' ? {id: taskOrProgression, weight: 1.0} : taskOrProgression;
       
       if (this._tasks.has(task.id))
-        throw Error('Cannot have the same task added twice ' + taskOrProgression.id);
+        throw Error('Cannot have the same task added twice ' + taskOrProgression);
         
       task = new TaskNode(task);
     }
