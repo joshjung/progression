@@ -8,10 +8,15 @@
   "url": "https://github.com/joshjung/progression",
   "homepage": "https://github.com/joshjung/progression",
   "email": "joshua.p.jung@gmail.com",
+  "scripts": {
+    "release:major": "npm version major && git push --follow-tags && npm publish",
+    "release:minor": "npm version minor && git push --follow-tags && npm publish",
+    "release:patch": "npm version patch && git push --follow-tags && npm publish"
+  },
   "dependencies": {
     "debug": "^2.1.0",
-    "hasharray": "^0.3.0",
-    "jclass": "^1.0.1"
+    "hasharray": "^1.1.1",
+    "jclass": "^1.2.1"
   },
   "repository": {
     "type": "git",

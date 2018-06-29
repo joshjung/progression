@@ -40,11 +40,12 @@ var TaskNode = JClass._extend({
     if (obj.isProgression)
       this.progression = obj;
 
+    obj = obj || {};
     this.id = obj.id;
     this.name = obj.name;
     this.weight = obj.weight || 1.0;
     this._tasks = undefined;
-    this.completed = false;
+    this.completed = !!obj.completedWhenEmpty;
   },
   //-----------------------------------
   // Methods
@@ -59,6 +60,7 @@ var TaskNode = JClass._extend({
     if (this.progression)
       return this.progression.getProgress();
 
+    ///console.log(this.completed, this.isCompleted());
     if (!this.hasChildren())
       return this.isCompleted() ? 1.0 : 0.0;
 
@@ -89,7 +91,7 @@ var Progression = EventDispatcher._extend({
 
     this._tasks.all.forEach(function (task) {
       (!task.isCompleted()) ? ret.push(task.id) : '';
-    })
+    });
 
     return ret;
   },
@@ -108,7 +110,13 @@ var Progression = EventDispatcher._extend({
   //-----------------------------------
   // Constructor
   //-----------------------------------
-  init: function (id) {
+  init: function (id, options) {
+    if (typeof id === 'object') {
+      options = id;
+      id = undefined;
+    }
+
+    this.options = options || {};
     this.id = id;
     this.weight = 1.0;
     this.reset();
@@ -119,7 +127,11 @@ var Progression = EventDispatcher._extend({
   //-----------------------------------
   reset: function () {
     this._tasks = new HashArray(['id']);
-    this.root = new TaskNode({id: 'root', weight: 1.0});
+    this.root = new TaskNode({
+      id: 'root',
+      weight: 1.0,
+      completedWhenEmpty: this.options.completedWhenEmpty
+    });
     this._tasks.add(this.root);
     this.lastProgress = 0;
 
@@ -128,7 +140,7 @@ var Progression = EventDispatcher._extend({
   debug: function () {
     // Show all uncompleted tasks
     var ret = [];
-  
+
     this._tasks.forEach('*', function (task) {
       if (!task.isCompleted())
       {
@@ -138,7 +150,7 @@ var Progression = EventDispatcher._extend({
           ret.push(task);
       }
     });
-    
+
     return ret;
   },
   addTasks: function () {
@@ -147,12 +159,12 @@ var Progression = EventDispatcher._extend({
   },
   addTask: function (taskOrProgression, parentId) {
     var task = undefined;
-    
+
     if (taskOrProgression.isProgression)
     {
       if (this._tasks.has(taskOrProgression.id))
         throw Error('Cannot have the same progression added twice ' + taskOrProgression);
-        
+
       taskOrProgression.on('progress', this.childProgression_progressHandler.bind(this));
 
       task = new TaskNode(taskOrProgression);
@@ -160,10 +172,10 @@ var Progression = EventDispatcher._extend({
     else
     {
       var task = typeof(taskOrProgression) == 'string' ? {id: taskOrProgression, weight: 1.0} : taskOrProgression;
-      
+
       if (this._tasks.has(task.id))
         throw Error('Cannot have the same task added twice ' + taskOrProgression);
-        
+
       task = new TaskNode(task);
     }
 
@@ -171,9 +183,9 @@ var Progression = EventDispatcher._extend({
 
     if (!parentTask)
       throw Error('Could not find parentTask with id ' + parentId + ' on progression ' + this.id);
-      
+
     parentTask.addTask(task);
-    
+
     this._tasks.add(task);
     this.update(task);
   },
@@ -199,7 +211,7 @@ var Progression = EventDispatcher._extend({
 
     if (!task)
       throw Error('Task not found: ' + id);
-    
+
     if (task.hasChildren())
     {
       throw Error('Cannot add progress to a task with children. Complete all children to finish parent level task.');
@@ -209,7 +221,7 @@ var Progression = EventDispatcher._extend({
 
     if (task.completed)
       this.emit('completed', task);
-      
+
     this.update(task);
   },
   //-----------------------------------
